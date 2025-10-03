@@ -11,11 +11,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Link } from "react-router";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PasswordInput from "@/components/ui/passwordInput";
 import MobileInput from "@/components/ui/MobileInput";
+import { useRegisterMutation } from "@/redux/auth/auth.api";
+import { toast } from "sonner";
+import { useState } from "react";
+import { Link } from "react-router";
 const registerSchema = z
   .object({
     name: z
@@ -24,7 +27,7 @@ const registerSchema = z
         message: "Username must be at least 2 characters.",
       })
       .max(50),
-    email: z.email(),
+    email: z.string().email(),
     password: z
       .string()
       .min(8, {
@@ -47,7 +50,12 @@ const registerSchema = z
       .regex(/[^a-zA-Z0-9]/, {
         message: "Password must contain at least one special character.",
       }),
-    phone: z.string(),
+    phone: z
+      .string({ message: "Phone must be string" })
+      .regex(/^(\+91|91)?[6-9]\d{9}$/, {
+        message:
+          "Invalid Indian phone number format. Must be 10 digits starting with 6-9 or +91/91",
+      }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "password do not match",
@@ -58,6 +66,8 @@ export default function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const [register] = useRegisterMutation();
+  const [loader, setLoader] = useState(Boolean);
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -69,8 +79,27 @@ export default function RegisterForm({
     },
   });
 
-  const onsubmit = (data: z.infer<typeof registerSchema>) => {
-    console.log(data);
+  const onsubmit = async (data: z.infer<typeof registerSchema>) => {
+    try {
+      setLoader(true);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { confirmPassword, ...userdata } = data;
+      const result = await register(userdata).unwrap();
+      console.log(result);
+      if (result.statusCode === 201) {
+        toast.success("user created successfully");
+        form.reset();
+        setLoader(false);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    } finally {
+      setLoader(false);
+    }
   };
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -157,7 +186,7 @@ export default function RegisterForm({
                   <FormControl>
                     {/* <Input placeholder="9012746798" {...field} /> */}
                   </FormControl>
-                  <MobileInput {...field}/>
+                  <MobileInput {...field} />
                   <FormDescription className="sr-only">
                     This is your phone number.
                   </FormDescription>
@@ -165,8 +194,11 @@ export default function RegisterForm({
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full cursor-pointer">
-              Register
+            <Button
+              type="submit"
+              className={`${loader && "disabled:"} w-full cursor-pointer`}
+            >
+              {loader ? <span>Loading...</span> : <>Register</>}
             </Button>{" "}
           </form>
         </Form>
@@ -186,10 +218,13 @@ export default function RegisterForm({
           Login with Google
         </Button> */}
       </div>
-      <div className="text-center text-sm">
+      <div className={`text-center  text-sm`}>
         Don&apos;t have an account?{" "}
-        <Link to={"/login"} className="underline underline-offset-4">
-          Sign in
+        <Link
+          to={"/login"}
+          className="hover:text-primary duration-300 transition-colors underline"
+        >
+          Log in
         </Link>
       </div>
     </div>
