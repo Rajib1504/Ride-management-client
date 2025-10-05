@@ -18,7 +18,7 @@ import MobileInput from "@/components/ui/MobileInput";
 import { useRegisterMutation } from "@/redux/auth/auth.api";
 import { toast } from "sonner";
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 const registerSchema = z
   .object({
     name: z
@@ -68,6 +68,7 @@ export default function RegisterForm({
 }: React.ComponentProps<"div">) {
   const [register] = useRegisterMutation();
   const [loader, setLoader] = useState(Boolean);
+  const navigate = useNavigate()
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -90,6 +91,7 @@ export default function RegisterForm({
         toast.success("user created successfully");
         form.reset();
         setLoader(false);
+        navigate('/login')
       }
     } catch (error) {
       if (error instanceof Error) {
