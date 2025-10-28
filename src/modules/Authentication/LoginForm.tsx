@@ -9,11 +9,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { useLoginMutation } from "@/redux/auth/auth.api";
+import { useLoginMutation } from "@/redux/features/auth/auth.api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -25,9 +25,8 @@ export default function LoginForm({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
-  const navigate = useNavigate();
   const [login] = useLoginMutation();
-  const [loading, setLoading] = useState(Boolean);
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,13 +43,16 @@ export default function LoginForm({
       console.log(res);
       if (res.statusCode === 200) {
         toast.success(`Wellcome Back ${res?.data?.user?.name}`);
-        navigate("/");
-        setLoading(false);
+window.location.href='/'
       }
-    } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
       console.error(err);
-      setLoading(false);
-    } finally {
+      if (err.data) {
+        toast.error(err.data.message || "something went wrong");
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
       setLoading(false);
     }
   };
@@ -105,14 +107,15 @@ export default function LoginForm({
 
             <Button
               type="submit"
-              className={`w-full ${loading && "disabled:"} cursor-pointer`}
+              disabled={loading}
+              className={`w-full  cursor-pointer`}
             >
               {loading ? <>loading...</> : <>Login</>}
             </Button>
           </form>
         </Form>
 
-        <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
+        {/* <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
           <span className="relative z-10 bg-background px-2 text-muted-foreground">
             Or continue with
           </span>
@@ -124,11 +127,15 @@ export default function LoginForm({
           className="w-full cursor-pointer"
         >
           Login with Google
-        </Button>
+        </Button> */}
       </div>
       <div className="text-center text-sm">
         Don&apos;t have an account?{" "}
-        <Link to="/register" replace className="underline underline-offset-4">
+        <Link
+          to="/register"
+          replace
+          className="hover:text-primary duration-300 transition-colors underline"
+        >
           Register
         </Link>
       </div>

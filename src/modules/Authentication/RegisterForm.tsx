@@ -15,7 +15,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PasswordInput from "@/components/ui/passwordInput";
 import MobileInput from "@/components/ui/MobileInput";
-import { useRegisterMutation } from "@/redux/auth/auth.api";
+import { useRegisterMutation } from "@/redux/features/auth/auth.api";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
@@ -67,7 +67,7 @@ export default function RegisterForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [register] = useRegisterMutation();
-  const [loader, setLoader] = useState(Boolean);
+  const [loader, setLoader] = useState(false);
   const navigate = useNavigate()
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -90,7 +90,6 @@ export default function RegisterForm({
       if (result.statusCode === 201) {
         toast.success("user created successfully");
         form.reset();
-        setLoader(false);
         navigate('/login')
       }
     } catch (error) {
@@ -198,7 +197,8 @@ export default function RegisterForm({
             />
             <Button
               type="submit"
-              className={`${loader && "disabled:"} w-full cursor-pointer`}
+              disabled={loader}
+              className={` w-full cursor-pointer`}
             >
               {loader ? <span>Loading...</span> : <>Register</>}
             </Button>{" "}

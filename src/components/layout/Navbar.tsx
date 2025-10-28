@@ -8,13 +8,18 @@ import {
 } from "@/components/ui/navigation-menu";
 
 import {
-
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ModeToggle } from "../Mode.toggle";
 import { Link } from "react-router";
+import {
+  authApi,
+  useLogOutMutation,
+  useUserInfoQuery,
+} from "@/redux/features/auth/auth.api";
+import { useAppDispatch } from "@/redux/hook";
 
 // Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
@@ -26,6 +31,17 @@ const navigationLinks = [
 ];
 
 export default function Component() {
+  const { data } = useUserInfoQuery(undefined, {
+  });
+  console.log(data?.data?.email);
+  const [logout] = useLogOutMutation();
+  const dispatch = useAppDispatch();
+
+  const handleLogout = () => {
+    logout(undefined);
+    dispatch(authApi.util.resetApiState());
+    window.location.href='/login'
+  };
   return (
     <header className=" container border-b px-4 md:px-6">
       <div className="flex h-16 items-center justify-between gap-4">
@@ -72,10 +88,11 @@ export default function Component() {
                   {navigationLinks.map((link, index) => (
                     <NavigationMenuItem key={index} className="w-full">
                       <NavigationMenuLink
-                        href={link.href} asChild
+                        href={link.href}
+                        asChild
                         className="py-1.5"
                       >
-                       <Link to={link.href}>{link.label}</Link>
+                        <Link to={link.href}>{link.label}</Link>
                       </NavigationMenuLink>
                     </NavigationMenuItem>
                   ))}
@@ -86,18 +103,19 @@ export default function Component() {
           {/* Main nav */}
           <div className="flex items-center gap-6">
             <a href="#" className="text-primary hover:text-primary/90">
-              <Logo/>
+              <Logo />
             </a>
             {/* Navigation menu */}
             <NavigationMenu className="max-md:hidden">
               <NavigationMenuList className="gap-2">
                 {navigationLinks.map((link, index) => (
                   <NavigationMenuItem key={index}>
-                    <NavigationMenuLink asChild
+                    <NavigationMenuLink
+                      asChild
                       href={link.href}
                       className="text-muted-foreground hover:text-primary py-1.5 font-medium"
                     >
-                  <Link to={link.href}>{link.label}</Link>
+                      <Link to={link.href}>{link.label}</Link>
                     </NavigationMenuLink>
                   </NavigationMenuItem>
                 ))}
@@ -107,11 +125,20 @@ export default function Component() {
         </div>
         {/* Right side */}
         <div className="flex items-center gap-2">
-          <ModeToggle/>
-          <Button asChild variant="ghost" className="text-sm">
-            <Link to={'/login'}>Login</Link>
-          </Button>
-         
+          <ModeToggle />
+          {data?.data?.email ? (
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="text-sm"
+            >
+              Logout
+            </Button>
+          ) : (
+            <Button asChild variant="ghost" className="text-sm">
+              <Link to={"/login"}>Login</Link>
+            </Button>
+          )}
         </div>
       </div>
     </header>
