@@ -8,6 +8,10 @@ import Home from "@/pages/Home";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import BookRide from "@/pages/User/BookRide";
+import AccptBooking from "@/pages/Rider/AccptBooking";
+import { generateRoutes } from "@/utils/generateRoute";
+import { adminSidebarItems } from "./adminSidebarItems";
 
 export const router = createBrowserRouter([
       {
@@ -44,15 +48,28 @@ export const router = createBrowserRouter([
       },
       {
             Component: DashboardLayout,
-            path: '/admin'
+            path: '/admin',
+            children: [...generateRoutes(adminSidebarItems)]
       },
       {
             Component: DashboardLayout,
-            path: "/user"
+            path: "/user",
+            children: [
+                  {
+                        Component: BookRide,
+                        path: 'bookride'
+                  }
+            ]
       },
       {
             Component: DashboardLayout,
-            path: "/rider"
+            path: "/rider",
+            children: [
+                  {
+                        Component: AccptBooking,
+                        path: "accptbooking"
+                  }
+            ]
       }
 
 
