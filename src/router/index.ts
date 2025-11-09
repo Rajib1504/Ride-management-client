@@ -1,4 +1,5 @@
-import { createBrowserRouter } from "react-router";
+import React from "react";
+import { createBrowserRouter, Navigate } from "react-router";
 import About from "@/pages/About";
 import App from "@/App";
 import Features from "@/pages/Features";
@@ -8,10 +9,10 @@ import Home from "@/pages/Home";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import BookRide from "@/pages/User/BookRide";
-import AccptBooking from "@/pages/Rider/AccptBooking";
 import { generateRoutes } from "@/utils/generateRoute";
 import { adminSidebarItems } from "./adminSidebarItems";
+import { riderSidebarItems } from "./riderSidebarItems";
+import { driverSidebarItems } from "./driverSideBarItems";
 
 export const router = createBrowserRouter([
       {
@@ -20,7 +21,7 @@ export const router = createBrowserRouter([
             children: ([
                   {
                         Component: Home,
-                        path: ''
+                        index: true
                   },
                   {
                         Component: About,
@@ -48,29 +49,24 @@ export const router = createBrowserRouter([
       },
       {
             Component: DashboardLayout,
-            path: '/admin',
-            children: [...generateRoutes(adminSidebarItems)]
-      },
-      {
-            Component: DashboardLayout,
-            path: "/user",
+            path: "/admin",
             children: [
-                  {
-                        Component: BookRide,
-                        path: 'bookride'
-                  }
+                  { index: true, element: React.createElement(Navigate, { to: "/admin/analytics" }) },
+                  ...generateRoutes(adminSidebarItems)
             ]
       },
       {
             Component: DashboardLayout,
             path: "/rider",
-            children: [
-                  {
-                        Component: AccptBooking,
-                        path: "accptbooking"
-                  }
-            ]
+            children: [{ index: true, element: React.createElement(Navigate, { to: "/rider/accpt-booking" }) }, ...generateRoutes(riderSidebarItems)]
+      },
+      {
+            Component: DashboardLayout,
+            path: "/driver",
+            children: [{ index: true, element: React.createElement(Navigate, { to: "/driver/accpt-booking" }) }, ...generateRoutes(driverSidebarItems)]
       }
 
 
 ])
+
+

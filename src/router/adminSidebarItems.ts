@@ -1,9 +1,13 @@
-import ActiveTrips from "@/pages/Admin/ActiveTrips";
-import Analytics from "@/pages/Admin/Analytics";
-import CompleteTrips from "@/pages/Admin/CompleteTrips";
-import Users from "@/pages/Admin/Users";
+// import ActiveTrips from "@/pages/Admin/ActiveTrips";
+// import Analytics from "@/pages/Admin/Analytics";
+// import CompleteTrips from "@/pages/Admin/CompleteTrips";
+// import Users from "@/pages/Admin/Users";
 import type { ISidebar } from "@/types";
-
+import { lazy } from "react";
+const Analytics = lazy(() => import("@/pages/Admin/Analytics"))
+const CompleteTrips = lazy(() => import("@/pages/Admin/CompleteTrips"))
+const Users = lazy(() => import("@/pages/Admin/Users"))
+const ActiveTrips = lazy(() => import("@/pages/Admin/ActiveTrips"))
 export const adminSidebarItems: ISidebar[] = [
       {
             title: "Analytics",
@@ -11,7 +15,7 @@ export const adminSidebarItems: ISidebar[] = [
                   {
                         title: "Analytics",
                         url: "/admin/analytics",
-                        Component: Analytics
+                        component: Analytics,
                   }
             ],
       },
@@ -22,12 +26,12 @@ export const adminSidebarItems: ISidebar[] = [
                   {
                         title: "Active Trips",
                         url: '/admin/active-trips',
-                        Component: ActiveTrips
+                        component: ActiveTrips
                   },
                   {
                         title: "Complete Trips",
                         url: "/admin/complet-trips",
-                        Component: CompleteTrips
+                        component: CompleteTrips
                   }
 
             ]
@@ -39,7 +43,7 @@ export const adminSidebarItems: ISidebar[] = [
                   {
                         title: "All users",
                         url: "/admin/all-users",
-                        Component: Users
+                        component: Users
                   },
 
             ]

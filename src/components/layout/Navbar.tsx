@@ -20,27 +20,30 @@ import {
   useUserInfoQuery,
 } from "@/redux/features/auth/auth.api";
 import { useAppDispatch } from "@/redux/hook";
+import { role } from "@/constants/role";
 
 // Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
-  { href: "/", label: "Home" },
-  { href: "/about", label: "About Us" },
-  { href: "/features", label: "Features " },
-  { href: "/contact", label: "Contact " },
-  { href: "/faq", label: "FAQ " },
+  { href: "/", label: "Home", role: "PUBLIC" },
+  { href: "/about", label: "About Us", role: "PUBLIC" },
+  { href: "/features", label: "Features ", role: "PUBLIC" },
+  { href: "/contact", label: "Contact ", role: "PUBLIC" },
+  { href: "/faq", label: "FAQ ", role: "PUBLIC" },
+  { href: "/rider", label: "Dashboard", role: role.rider },
+  { href: "/driver", label: "Dashboard", role: role.driver },
+  { href: "/admin", label: "Dashboard", role: role.admin },
 ];
 
 export default function Component() {
-  const { data } = useUserInfoQuery(undefined, {
-  });
-  // console.log(data?.data?.email);
+  const { data } = useUserInfoQuery(undefined, {});
+  // console.log(data?.data);
   const [logout] = useLogOutMutation();
   const dispatch = useAppDispatch();
 
   const handleLogout = () => {
     logout(undefined);
     dispatch(authApi.util.resetApiState());
-    window.location.href='/login'
+    window.location.href = "/login";
   };
   return (
     <header className=" container border-b px-4 md:px-6">
@@ -86,15 +89,30 @@ export default function Component() {
               <NavigationMenu className="max-w-none *:w-full">
                 <NavigationMenuList className="flex-col items-start gap-0 md:gap-2">
                   {navigationLinks.map((link, index) => (
-                    <NavigationMenuItem key={index} className="w-full">
-                      <NavigationMenuLink
-                        href={link.href}
-                        asChild
-                        className="py-1.5"
-                      >
-                        <Link to={link.href}>{link.label}</Link>
-                      </NavigationMenuLink>
-                    </NavigationMenuItem>
+                    <>
+                      {link.role === "PUBLIC" && (
+                        <NavigationMenuItem key={index} className="w-full">
+                          <NavigationMenuLink
+                            href={link.href}
+                            asChild
+                            className="py-1.5"
+                          >
+                            <Link to={link.href}>{link.label}</Link>
+                          </NavigationMenuLink>
+                        </NavigationMenuItem>
+                      )}
+                      {link.role === data?.data?.role && (
+                        <NavigationMenuItem key={index} className="w-full">
+                          <NavigationMenuLink
+                            href={link.href}
+                            asChild
+                            className="py-1.5"
+                          >
+                            <Link to={link.href}>{link.label}</Link>
+                          </NavigationMenuLink>
+                        </NavigationMenuItem>
+                      )}
+                    </>
                   ))}
                 </NavigationMenuList>
               </NavigationMenu>
@@ -109,15 +127,30 @@ export default function Component() {
             <NavigationMenu className="max-md:hidden">
               <NavigationMenuList className="gap-2">
                 {navigationLinks.map((link, index) => (
-                  <NavigationMenuItem key={index}>
-                    <NavigationMenuLink
-                      asChild
-                      href={link.href}
-                      className="text-muted-foreground hover:text-primary py-1.5 font-medium"
-                    >
-                      <Link to={link.href}>{link.label}</Link>
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
+                  <>
+                    {link.role === "PUBLIC" && (
+                      <NavigationMenuItem key={index}>
+                        <NavigationMenuLink
+                          asChild
+                          href={link.href}
+                          className="text-muted-foreground hover:text-primary py-1.5 font-medium"
+                        >
+                          <Link to={link.href}>{link.label}</Link>
+                        </NavigationMenuLink>
+                      </NavigationMenuItem>
+                    )}
+                    {link.role === data?.data?.role && (
+                      <NavigationMenuItem key={index}>
+                        <NavigationMenuLink
+                          asChild
+                          href={link.href}
+                          className="text-muted-foreground hover:text-primary py-1.5 font-medium"
+                        >
+                          <Link to={link.href}>{link.label}</Link>
+                        </NavigationMenuLink>
+                      </NavigationMenuItem>
+                    )}
+                  </>
                 ))}
               </NavigationMenuList>
             </NavigationMenu>
