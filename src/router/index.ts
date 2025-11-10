@@ -13,6 +13,10 @@ import { generateRoutes } from "@/utils/generateRoute";
 import { adminSidebarItems } from "./adminSidebarItems";
 import { riderSidebarItems } from "./riderSidebarItems";
 import { driverSidebarItems } from "./driverSideBarItems";
+import { withAuth } from "@/utils/withAuth";
+import { role } from "@/constants/role";
+import type { TRole } from "@/types";
+import Unauthorised from "@/pages/Unauthorised";
 
 export const router = createBrowserRouter([
       {
@@ -36,7 +40,7 @@ export const router = createBrowserRouter([
                         path: 'faq'
                   },
                   {
-                        Component: Contact,
+                        Component: withAuth(Contact),
                         path: 'contact'
                   }, {
                         Component: Login,
@@ -45,10 +49,14 @@ export const router = createBrowserRouter([
                         Component: Register,
                         path: '/register'
                   },
+                  {
+                        Component: Unauthorised,
+                        path: '/unauthorized'
+                  },
             ])
       },
       {
-            Component: DashboardLayout,
+            Component: withAuth(DashboardLayout, role.admin as TRole),
             path: "/admin",
             children: [
                   { index: true, element: React.createElement(Navigate, { to: "/admin/analytics" }) },
@@ -56,15 +64,16 @@ export const router = createBrowserRouter([
             ]
       },
       {
-            Component: DashboardLayout,
+            Component: withAuth(DashboardLayout, role.rider as TRole),
             path: "/rider",
             children: [{ index: true, element: React.createElement(Navigate, { to: "/rider/accpt-booking" }) }, ...generateRoutes(riderSidebarItems)]
       },
       {
-            Component: DashboardLayout,
+            Component: withAuth(DashboardLayout, role.driver as TRole),
             path: "/driver",
             children: [{ index: true, element: React.createElement(Navigate, { to: "/driver/accpt-booking" }) }, ...generateRoutes(driverSidebarItems)]
-      }
+      },
+
 
 
 ])
