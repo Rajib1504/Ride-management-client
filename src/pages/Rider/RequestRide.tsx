@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import L from "leaflet";
 import LeafletRouting from "@/components/LeafletRouting";
 import LeafletGeosearch from "@/components/LeafletGeosearch";
-import { useRequestrideMutation } from "@/redux/features/ride/ride.api";
+import { useRequestRideMutation } from "@/redux/features/ride/ride.api";
 
 // Define coordinate types
 type TGeoJson = {
@@ -19,19 +19,26 @@ type TLatLng = {
 };
 
 // A small component to show the user's live location
-const LocationMarker = ({ setInitialCenter }: { setInitialCenter: (pos: TLatLng) => void }) => {
+const LocationMarker = ({
+  setInitialCenter,
+}: {
+  setInitialCenter: (pos: TLatLng) => void;
+}) => {
   const [position, setPosition] = useState<L.LatLng | null>(null);
   const map = useMap();
 
   useEffect(() => {
-    map.locate().on("locationfound", function (e) {
-      setPosition(e.latlng);
-      map.flyTo(e.latlng, 14); // Fly to user's location
-      setInitialCenter(e.latlng); // Send location to parent
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    }).on("locationerror", function (e) {
-      toast.error("Could not find your location. Please enable permissions.");
-    });
+    map
+      .locate()
+      .on("locationfound", function (e) {
+        setPosition(e.latlng);
+        map.flyTo(e.latlng, 14); // Fly to user's location
+        setInitialCenter(e.latlng); // Send location to parent
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      })
+      .on("locationerror", function (e) {
+        toast.error("Could not find your location. Please enable permissions.");
+      });
   }, [map, setInitialCenter]);
 
   return position === null ? null : (
@@ -56,15 +63,23 @@ const RequestRidePage = () => {
   });
 
   // The RTK Query hook for our API
-  const [requestRide, { isLoading }] = useRequestrideMutation();
+  const [requestRide, { isLoading }] = useRequestRideMutation();
 
-  const handleSetPickup = (loc: { lat: number; lng: number; label: string }) => {
+  const handleSetPickup = (loc: {
+    lat: number;
+    lng: number;
+    label: string;
+  }) => {
     setPickupCoords(loc);
     setPickup({ type: "Point", coordinates: [loc.lng, loc.lat] });
     toast.success(`Pickup set: ${loc.label.substring(0, 30)}...`);
   };
-  
-  const handleSetDestination = (loc: { lat: number; lng: number; label: string }) => {
+
+  const handleSetDestination = (loc: {
+    lat: number;
+    lng: number;
+    label: string;
+  }) => {
     setDestCoords(loc);
     setDestination({ type: "Point", coordinates: [loc.lng, loc.lat] });
     toast.success(`Destination set: ${loc.label.substring(0, 30)}...`);
@@ -76,12 +91,12 @@ const RequestRidePage = () => {
       return;
     }
     try {
-      const res = await requestRide({ 
-        pickupLocation: pickup, 
-        destinationLocation: destination 
+      const res = await requestRide({
+        pickupLocation: pickup,
+        destinationLocation: destination,
       }).unwrap();
       toast.success(res.message || "Ride requested! Searching for drivers...");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(err.data.message || "Failed to request ride.");
     }
@@ -89,7 +104,14 @@ const RequestRidePage = () => {
 
   return (
     <div className="space-y-4">
-      <div style={{ height: "60vh", width: "100%", borderRadius: '8px', overflow: 'hidden' }}>
+      <div
+        style={{
+          height: "60vh",
+          width: "100%",
+          borderRadius: "8px",
+          overflow: "hidden",
+        }}
+      >
         <MapContainer
           center={[initialCenter.lat, initialCenter.lng]}
           zoom={13}
@@ -99,7 +121,7 @@ const RequestRidePage = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           />
-          
+
           {/* 1. Component to find user's location */}
           <LocationMarker setInitialCenter={setInitialCenter} />
 
@@ -108,9 +130,9 @@ const RequestRidePage = () => {
             onLocationSelect={handleSetPickup}
             placeholder="Set pickup location"
           />
-          
+
           {/* 3. Search box for Destination */}
-          <LeafletGeosearch 
+          <LeafletGeosearch
             onLocationSelect={handleSetDestination}
             placeholder="Set destination location"
           />

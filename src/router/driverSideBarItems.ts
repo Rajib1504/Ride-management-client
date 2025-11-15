@@ -8,7 +8,7 @@ export const driverSidebarItems: ISidebar[] = [
             title: "History",
             items: [
                   {
-                        title: "Booking History",
+                        title: "Accpt Booking",
                         url: "/driver/accpt-booking",
                         component: AccptBooking
                   }
