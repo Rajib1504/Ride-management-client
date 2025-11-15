@@ -5,7 +5,7 @@ export const baseApi = createApi({
       reducerPath: "baseApi",
       // baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:5000/api/v1" }),
       baseQuery: axiosBaseQuery(),
-      tagTypes: ["USER","RideHistory","PendingRides"],
+      tagTypes: ["USER","RideHistory","PendingRides","AllUsers","DriverApplications"],
       endpoints: () => ({})
 })
 
